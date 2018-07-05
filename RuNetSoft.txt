@@ -1,0 +1,75 @@
+1.  оличество показов баннера <img src="/banner.php"/> можно посчитать отсыла€ запрос к Ѕƒ с увеличением счЄтчика показов из banner.php, либо из скрипта страницы, в которую он вставлен, либо через AJAX по событию onload.
+ оличество уникальных показов можно посчитать теми же способами, но с применением cookie и условий, опирающихс€ на их проверку.
+
+
+
+2.
+CREATE TABLE IF NOT EXISTS projects (
+  id smallint UNSIGNED NOT NULL AUTO_INCREMENT,
+  title varchar(255) NOT NULL,
+  PRIMARY KEY (id)
+)
+
+CREATE TABLE IF NOT EXISTS specs (
+  id tinyint UNSIGNED NOT NULL AUTO_INCREMENT,
+  title varchar(255) NOT NULL,
+  PRIMARY KEY (id)
+)
+
+CREATE TABLE IF NOT EXISTS staff (
+  id smallint UNSIGNED NOT NULL AUTO_INCREMENT,
+  name varchar(255) NOT NULL,
+  spec_id tinyint UNSIGNED NOT NULL,
+  PRIMARY KEY (id),
+  KEY spec_id (spec_id)
+)
+
+CREATE TABLE IF NOT EXISTS teams (
+  id mediumint UNSIGNED NOT NULL AUTO_INCREMENT,
+  project_id smallint UNSIGNED NOT NULL,
+  staff_id smallint UNSIGNED NOT NULL,
+  PRIMARY KEY (id),
+  KEY project_id (project_id),
+  KEY staff_id (staff_id)
+)
+
+SELECT projects.title
+  FROM (
+    SELECT teams.project_id AS proj_id, count(teams.staff_id) AS progs_count 
+      FROM teams 
+        LEFT JOIN staff ON teams.staff_id = staff.id
+        LEFT JOIN specs ON staff.spec_id = specs.id 
+      WHERE specs.title LIKE "%programmer%"
+      GROUP BY teams.project_id
+  ) AS temp 
+    LEFT JOIN projects ON temp.proj_id = projects.id
+  WHERE temp.progs_count >= 3
+
+
+
+3.
+CREATE TABLE IF NOT EXISTS tire (
+  id smallint UNSIGNED NOT NULL AUTO_INCREMENT,
+  title varchar(255) NOT NULL,
+  flag tinyint(1) UNSIGNED,
+  PRIMARY KEY (id)
+)
+
+CREATE TABLE IF NOT EXISTS properties (
+  id smallint UNSIGNED NOT NULL AUTO_INCREMENT,
+  tire_id smallint UNSIGNED NOT NULL,
+  brand varchar(32) NOT NULL,
+  model varchar(64) NOT NULL,
+  width smallint UNSIGNED NOT NULL,
+  height tinyint UNSIGNED NOT NULL,
+  construction varchar(1) NOT NULL,
+  diameter tinyint UNSIGNED NOT NULL,
+  load_index tinyint UNSIGNED NOT NULL,
+  speed_index varchar(2) NOT NULL,
+  characterizing varchar(16),
+  runflat varchar(16),
+  tube varchar(16),
+  season varchar(32),
+  PRIMARY KEY (id),
+  KEY tire_id (tire_id)
+)
